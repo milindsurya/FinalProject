@@ -1,0 +1,280 @@
+<html>
+    <head><title>Order</title></head>
+    <style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to right, #f2f9f9, #dff3f3);
+    padding: 30px;
+  }
+
+  h2, h3, h4 {
+    text-align: center;
+    color: #0a516d;
+    margin-bottom: 15px;
+  }
+
+  form {
+    background-color: #ffffff;
+    padding: 25px 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+    max-width: 500px;
+    margin: auto;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: 600;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  textarea,
+  select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+  }
+
+  button,
+  .btn {
+    background-color: #0a516d;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    display: block;
+    margin: 15px auto;
+  }
+
+  button:hover,
+  .btn:hover {
+    background-color: #088199;
+  }
+
+  #cartTable {
+    width: 90%;
+    margin: 20px auto;
+    border-collapse: collapse;
+  }
+
+  #cartTable th,
+  #cartTable td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+  }
+
+  #cartTable th {
+    background-color: #f1f1f1;
+    color: #0a516d;
+  }
+
+  #grandTotal {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #0a516d;
+    display: block;
+    margin-top: 10px;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+</style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+  $(document).ready(function () {
+    const priceMap = {
+      'carrot': { baseQty: 250, basePrice: 18, unit: 'g', options: [250, 500, 750, 1000] },
+      'potato': { baseQty: 500, basePrice: 20, unit: 'g', options: [500, 1000, 1500] },
+      'Amul_Milk': { baseQty: 1, basePrice: 26, unit: 'L', options: [0.5, 1, 1.5, 2] },
+      'Good_day_Biscuit': { baseQty: 1, basePrice: 10, unit: 'pc', options: [1, 2, 5, 10] },
+      'Apple': { baseQty: 4, basePrice: 120, unit: 'pc', options: [1,2, 3,4, 5,6,7,8,9,10] },
+      'Banana': { baseQty: 250, basePrice: 30, unit: 'g', options: [250, 500, 750, 1000] },
+      'Blueberry': { baseQty: 125, basePrice: 259, unit: 'g', options: [125,250, 500, 750, 1000] },
+      'Watermelon': { baseQty: 1, basePrice: 117, unit: 'pc', options: [1, 2, 3, 4] },
+      'Orange': { baseQty: 6, basePrice: 173, unit: 'pc', options: [3, 6, 8, 10] },
+      'Tender_Coconut': { baseQty: 1, basePrice: 69, unit: 'pc', options: [1,2,3,4] },
+      'Litchi': { baseQty: 500, basePrice: 117, unit: 'g', options: [250, 500, 750, 1000] },
+      'Mango': { baseQty: 1, basePrice: 128, unit: 'kg', options: [1,2,3,4] },
+      'Corainder_Leaves': { baseQty: 100, basePrice: 11, unit: 'g', options: [100,250,500,200] },
+      'Onion': { baseQty: 1, basePrice: 31, unit: 'kg', options: [1,2,3,4] },
+      'Cucumber': { baseQty: 1, basePrice: 41, unit: 'kg', options: [1,2,3,4] },
+      'Palak': { baseQty: 250, basePrice: 32, unit: 'g', options: [250, 500, 750, 1000] },
+      'Chilli': { baseQty: 250, basePrice: 24, unit: 'g', options: [250, 500, 750, 1000] },
+      'Tomato': { baseQty: 1, basePrice: 31, unit: 'kg', options: [1,2,3,4] },
+      'Curry_Leaves': { baseQty: 100, basePrice: 13, unit: 'g', options: [100,200,300,500] },
+      'Potato': { baseQty: 1, basePrice: 37, unit: 'kg', options: [1,2,3,4] },
+      'Methi': { baseQty: 100, basePrice: 17, unit: 'g', options: [100,250,500,1000] },
+      'Mint_Leaves': { baseQty: 100, basePrice: 13, unit: 'g', options: [100,250,200,300,500] },
+      'Brocolli': { baseQty: 1, basePrice: 78, unit: 'pc', options: [1,2,3,4,5] },
+      'Sweet_Potato': { baseQty: 500, basePrice: 19, unit: 'g', options: [250, 500, 750, 1000] },
+      'Capsium': { baseQty: 250, basePrice: 21, unit: 'g', options: [250, 500, 750, 1000] },
+      'Dragon_Fruit': { baseQty: 1, basePrice: 75, unit: 'pc', options: [1,2,3,4,5] },
+      'Ginger': { baseQty: 100, basePrice: 8, unit: 'g', options: [100, 250, 500, 750 ] },
+      'Kiwi': { baseQty: 3, basePrice: 144, unit: 'pc', options: [1,2,3,4,5] },
+      'Pineapple': { baseQty: 1, basePrice: 69, unit: 'pc', options: [1,2,3,4,5] },
+      'Avocado': { baseQty: 1, basePrice: 75, unit: 'pc', options: [1,2,3,4,5] },
+      'Amul_Butter': { baseQty: 200, basePrice: 126, unit: 'g', options: [200,250,500,750,1000] },
+      'Amul_Cheese': { baseQty: 200, basePrice: 138, unit: 'g', options: [200,250,500,750,1000] },
+      'Amul_Paneer': { baseQty: 200, basePrice: 100, unit: 'g', options: [200,250,400,500,750,1000] },
+      'Aashirvad_Atta': { baseQty: 1, basePrice: 71, unit: 'kg', options: [1,2,3,4,56,7,8,9,10] },
+      'Bread': { baseQty: 450, basePrice: 60, unit: 'g', options: [250,500,450,100,500,750,1000] },
+
+
+
+    };
+
+    $('#product').on('change', function () {
+    const product = $(this).val();
+    const productData = priceMap[product];
+
+    $('#quantity').empty().append('<option value="">-- Select quantity --</option>');
+    if (productData) {
+      productData.options.forEach(qty => {
+        const label = productData.unit === 'g' && qty >= 1000 ? `${qty / 1000}kg` : `${qty}${productData.unit}`;
+        $('#quantity').append(`<option value="${qty}">${label}</option>`);
+      });
+    }
+  });
+
+  function calculateAmount(product, qty) {
+    const p = priceMap[product];
+    return ((qty / p.baseQty) * p.basePrice).toFixed(2);
+  }
+
+  let grandTotal = 0;
+
+  $('#addToCart').on('click', function () {
+    const product = $('#product').val();
+    const qty = $('#quantity').val();
+
+    if (!product || !qty) return alert('Please select product and quantity.');
+
+    const amount = calculateAmount(product, qty);
+
+    $('#cartTable tbody').append(`
+      <tr data-amount="${amount}">
+        <td>${product}</td>
+        <td>${qty}${priceMap[product].unit}</td>
+        <td>₹${amount}</td>
+        <td><button class="remove">❌</button></td>
+      </tr>
+    `);
+
+    grandTotal += parseFloat(amount);
+    $('#grandTotal').text(grandTotal.toFixed(2));
+  });
+
+  // Remove item from cart
+  $('#cartTable').on('click', '.remove', function () {
+    const row = $(this).closest('tr');
+    const amt = parseFloat(row.data('amount'));
+    grandTotal = amt;
+    row.remove();
+    $('#grandTotal').text(grandTotal.toFixed(2));
+  });
+});
+</script>
+        <body bgcolor="#EBFFD8">
+            <form action="orderphp.php" method="post">
+                <h2 style="text-align: center; font-family: 'Segoe UI',sans-serif; font-size: 28px; color: #00796b;">
+                    Let's Get Your Order Ready!!
+                </h2>
+                <label for="name">Name:</label>
+                <input  type="text" id="empname" name="name" required>
+               
+
+	 <label for="email">Email:</label>
+
+                <input type="email" id="email" name="email" required>
+                <label for="contact">Contact:</label>
+                <input type="text" id="contact" name="contact" required placeholder="+91">
+                <label for="address">Address:</label>
+                <textarea type="address" id="address" name="address" required></textarea>
+                <label for="product">Product Name:</label>
+                <select id="product" name="product" style="width: 500px; height: 40px;">
+                    <option value="">--Select a product--</option>
+                    <optgroup label="Fruits">
+                        <option value="Mango">Mango</option>
+                        <option value="Apple">Apple</option>
+                        <option value="Banana">Banana</option>
+                        <option value="Blueberry">Blueberry</option>
+                        <option value="Watermelon">Watermelon</option>
+                        <option value="Orange">Orange</option>
+                        <option value="Tender_Coconut">Tender Coconut</option>
+                        <option value="Litchi">Litchi</option>
+                    </optgroup>
+                    <optgroup label="Vegetables">
+                        <option value="Coriander_Leaves">Coriander Leaves</option>
+                        <option value="carrot">Carrot</option>
+                        <option value="Onion">Onion</option>
+                        <option value="Cucumber">Cucumber</option>
+                        <option value="Palak">Palak</option>
+                        <option value="Chilli">Chilli</option>
+                        <option value="Tomato">Tomato</option>
+                        <option value="Curry_Leaves">Curry Leaves</option>
+                        <option value="potato">Potato</option>
+                        <option value="Methi">Methi</option>
+                    </optgroup>
+                    <optgroup label="Exotic Veggies">
+                        <option value="Mint_Leaves">Mint Leaves</option>
+                        <option value="Brocolli">Brocolli</option>
+                        <option value="Sweet_Potato">Sweet Potato</option>
+                        <option value="Capsicum">Capsicum</option>
+                        <option value="Dragon_Fruit">Dragon Fruit</option>
+                        <option value="Ginger">Ginger</option>
+                        <option value="Kiwi">Kiwi</option>
+                        <option value="Pineapple">Pineapple</option>
+                        <option value="Avocado">Avocado</option>
+                    </optgroup>
+                    <optgroup label="Other Grocery">
+                        <option value="Amul_Milk">Amul Milk</option>
+                        <option value="Amul_Butter">Amul Butter</option>
+                        <option value="Amul_Cheese">Amul Cheese</option>
+                        <option value="Aashirvad_Atta">Aashirvad Atta</option>
+                        <option value="Good_day_Biscuit">Good day Biscuit</option>
+                        <option value="Bread">Bread</option>
+                        <option value="Amul_Paneer">Amul Paneer</option>
+                    </optgroup>
+                </select><br>
+                
+                <div style="display: inline-block;">
+                    <label for="quantity">Quantity:</label>
+                    <select id="quantity" style="width: 280px; height: 40px;">
+                        <option value="">--Select quantity--</option>
+                    </select>
+                
+                </div>
+
+                
+                
+                <button type="button" id="addToCart">Add to Cart</button>
+
+<h3>Your Cart</h3>
+<table border="1" id="cartTable">
+  <thead>
+    <tr>
+      <th>Product</th>
+      <th>Quantity</th>
+      <th>Amount</th>
+      <th>Remove</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+<h4>Total: <span id="grandTotal">0.00</span></h4>
+                <center>
+                <button type="submit" class="btn">Submit Order</button></center>
+            </form>
+        </body>
+</html>
